@@ -1,0 +1,17 @@
+{
+  "hooks": {
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "powershell",
+            "args": ["-NoProfile", "-ExecutionPolicy", "Bypass", "-File", ".claude/hooks/verify-build.ps1"],
+            "timeout": 180,
+            "statusMessage": "Verificando build .NET..."
+          }
+        ]
+      }
+    ]
+  }
+}

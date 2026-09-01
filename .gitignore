@@ -1,0 +1,19 @@
+# .NET
+bin/
+obj/
+*.user
+[Bb]in/
+[Oo]bj/
+
+# Visual Studio
+.vs/
+
+# Rider
+.idea/
+
+# Claude Code — settings pessoais (não versionar)
+.claude/settings.local.json
+
+# OS
+Thumbs.db
+.DS_Store
