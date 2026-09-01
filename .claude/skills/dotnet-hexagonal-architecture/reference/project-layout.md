@@ -18,11 +18,9 @@ Regra visual: a seta de `<ProjectReference>` só pode apontar para a esquerda (p
 
 ```xml
 <Project Sdk="Microsoft.NET.Sdk">
-  <PropertyGroup>
-    <TargetFramework>net9.0</TargetFramework>
-    <Nullable>enable</Nullable>
-    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
-  </PropertyGroup>
+  <!-- SEM PropertyGroup de versão. `TargetFramework` (net10.0), `Nullable`,
+       `LangVersion` e `TreatWarningsAsErrors` vêm do Directory.Build.props da RAIZ.
+       NUNCA redeclare aqui: a versão mora em UM lugar só (ADR-0009). -->
   <!-- NENHUM ProjectReference. NENHUM pacote de infra. Se precisar de algo externo,
        vira uma porta (interface) aqui e um adapter na Infrastructure. -->
 </Project>

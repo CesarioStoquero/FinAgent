@@ -1,6 +1,6 @@
 # Template canônico — Teste de unidade (domínio + handler, partida dobrada)
 
-Sem banco. xUnit + FluentAssertions. Modelo do ADR-0008: agregado `Account`, evento
+Sem banco. xUnit v3 + AwesomeAssertions. Modelo do ADR-0008: agregado `Account`, evento
 `TransactionPosted` com lançamentos que somam zero.
 
 ## Agregado — testar via eventos e a soma zero

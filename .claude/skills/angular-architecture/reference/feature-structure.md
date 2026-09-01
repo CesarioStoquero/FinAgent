@@ -1,3 +1,8 @@
+> ⚠ **PARCIALMENTE DESATUALIZADO (ADR-0009).** As seções de DTO, página, rota e a divisão
+> smart/dumb continuam válidas. Já o **api service está desatualizado**: usa `Observable` +
+> `toSignal`, e o padrão agora é `httpResource` para LEITURA (`HttpClient` só na escrita).
+> Não copie o bloco do api service sem converter.
+
 # Template canônico — Feature Angular (service, página, rota)
 
 Copie a estrutura. Standalone + signals + inject().

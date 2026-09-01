@@ -5,6 +5,9 @@ description: Padrões de Arquitetura Hexagonal (Ports & Adapters) para os servi�
 
 # Arquitetura Hexagonal em .NET (FinAgent)
 
+**Stack fixada (ADR-0009):** .NET 10 (`net10.0`), C# 14. NUNCA gere código ou `.csproj`
+para `net8.0`/`net9.0`. OpenAPI pelo `AddOpenApi()` nativo — **Swashbuckle é proibido**.
+
 Referência: ADR-0003. Regra inegociável: **dependências apontam para dentro**.
 
 Antes de criar uma classe, decida em QUAL camada ela mora (tabela abaixo). Se for um

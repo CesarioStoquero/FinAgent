@@ -1,3 +1,6 @@
+> **Runner: Vitest (ADR-0009).** `TestBed`, `describe`/`beforeEach` seguem iguais; importe os
+> globais de `vitest` quando não estiverem configurados como globais. NUNCA gere config de Karma.
+
 # Template canônico — Teste de frontend
 
 Testa COMPORTAMENTO visível (o que o usuário vê/dispara), não implementação.

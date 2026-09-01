@@ -5,7 +5,9 @@ description: Padrões de arquitetura para o frontend Angular do FinAgent. Use ao
 
 # Arquitetura Angular (FinAgent)
 
-Alvo: Angular moderno (standalone + signals). Sem NgModules legados.
+**Stack fixada (ADR-0009):** Angular **22** — standalone + signals, sem NgModule. Runner de
+teste **Vitest** (NUNCA gere Karma/Jasmine). **Signal Forms** nos formulários. Leitura de API
+via `httpResource`, escrita via `HttpClient`.
 
 Antes de criar um arquivo, decida a PASTA (tabela) e o TIPO. Para service de API ou
 página com estado, ABRA `reference/feature-structure.md` e copie a estrutura.
@@ -14,7 +16,8 @@ página com estado, ABRA `reference/feature-structure.md` e copie a estrutura.
 
 1. NUNCA use `NgModule`. Sempre standalone components.
 2. NUNCA use `RxJS` para estado. Estado = signals; `computed`/`effect` para derivado.
-   RxJS SÓ na borda de I/O (HTTP), convertido para signal com `toSignal`.
+   LEITURA de API usa `httpResource`, que já entrega `loading`/`error`/`value` como signals.
+   `toSignal(Observable)` é o padrão da era v16 — NUNCA use em código novo.
 3. NUNCA acesse `HttpClient` fora de um `*.api.service.ts`. Componente não chama API direto.
 4. NUNCA ponha lógica de estado num componente de `ui/` (dumb). Ele só recebe `input()`/emite `output()`.
 5. NUNCA use `any`. DTOs explícitos e tipados.
@@ -57,7 +60,8 @@ src/app/
 ## Comunicação com o backend
 
 - Um `*.api.service.ts` por agregado (`wallet.api.service.ts`).
-- `HttpClient` tipado; erro tratado por interceptor central (ver skill `angular-conventions`).
+- Leitura (saldo, extrato): `httpResource` tipado. Escrita (saque, depósito): `HttpClient`.
+- Erro tratado por interceptor central (ver skill `angular-conventions`).
 - Agente conversacional consumido por `agent.service.ts` dedicado (streaming quando houver).
 
 ## Checklist antes de concluir

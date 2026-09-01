@@ -1,3 +1,8 @@
+> ⚠ **DESATUALIZADO (ADR-0009) — NÃO COPIE.** O padrão do FinAgent passou a ser **Signal
+> Forms** (Angular 22). Este arquivo é Reactive Forms e permanece só como referência do
+> padrão anterior. O template válido é `signal-form.md`, ainda a escrever — se ele não
+> existir, PARE e avise, não copie daqui.
+
 # Template canônico — Reactive Form tipado + erros via signal
 
 Reactive Forms tipado. Mensagens derivadas de signals. Dinheiro em centavos no envio.

@@ -5,14 +5,18 @@ description: Convenções de código, formulários, HTTP e testes para o fronten
 
 # Convenções Angular (FinAgent)
 
-Regras de estilo e qualidade. Para formulário reativo, interceptor ou teste, ABRA o
+**Stack fixada (ADR-0009):** Angular **22**, **Signal Forms**, runner **Vitest**, `httpResource`
+para leitura. NUNCA gere Karma/Jasmine nem Reactive Forms em formulário novo.
+
+Regras de estilo e qualidade. Para formulário, interceptor ou teste, ABRA o
 template correspondente e copie a estrutura.
 
 ## Invariantes (NUNCA quebre)
 
 1. SEMPRE `changeDetection: OnPush` em todo componente.
 2. SEMPRE control flow novo: `@if`, `@for`, `@switch`. NUNCA `*ngIf`/`*ngFor`.
-3. NUNCA formulário template-driven. Sempre Reactive Forms TIPADO (`FormGroup<...>`).
+3. SEMPRE **Signal Forms** em formulário novo (estável na v22): modelo é um `signal`, regras
+   em `schema()`, binding por `[formField]`. NUNCA template-driven; NUNCA Reactive Forms novo.
 4. NUNCA lógica de negócio no template — extraia para `computed`/método.
 5. NUNCA trate erro HTTP componente a componente — um interceptor central mapeia
    erro HTTP → mensagem de domínio.
@@ -31,14 +35,14 @@ template correspondente e copie a estrutura.
 
 | Vou escrever…            | Template |
 |--------------------------|----------|
-| Formulário reativo tipado + validação/erro | `reference/reactive-form.md` |
+| Formulário (Signal Forms) + validação/erro | `reference/signal-form.md` ⚠ A ESCREVER |
 | Interceptor de erro/auth  | `reference/http-interceptor.md` |
 | Teste de componente/service | `reference/testing.md` |
 
 ## Checklist antes de concluir
 
 - [ ] `OnPush` e control flow novo (`@if`/`@for`)?
-- [ ] Formulário reativo tipado, mensagens de erro via signal/computed?
+- [ ] Formulário em Signal Forms, validação no `schema()`, erro exibido via signal?
 - [ ] Erro HTTP tratado no interceptor, não no componente?
 - [ ] Dinheiro exibido em BRL e enviado em centavos?
 - [ ] Teste para toda página e todo service de API?

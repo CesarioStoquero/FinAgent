@@ -5,6 +5,8 @@ description: Padrões de Event Sourcing e CQRS para o FinAgent em .NET. Use ao c
 
 # Event Sourcing + CQRS (FinAgent)
 
+**Stack fixada (ADR-0009):** .NET 10 (`net10.0`), C# 14.
+
 Referência: ADR-0001, ADR-0002, ADR-0007, ADR-0005.
 
 Antes de escrever código, identifique O QUE você está criando e siga a linha da tabela.
