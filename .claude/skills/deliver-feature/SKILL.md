@@ -1,63 +1,95 @@
 ---
 name: deliver-feature
-description: Orquestra a entrega de uma feature de ponta a ponta no FinAgent, encadeando os subagentes. Use quando quiser planejar e implementar uma spec com um único comando, ex.: "entregue a feature de docs/specs/wallet/spec.md". Invocável como /deliver-feature.
+description: Orquestra a entrega de uma feature de ponta a ponta no FinAgent, encadeando os subagentes COM CONFIRMAÇÃO a cada passo. Aceita uma ideia ("faça tal funcionalidade") ou o caminho de uma spec. Detecta quais agentes a feature precisa e pede sua autorização antes de chamar cada um. Invocável como /deliver-feature.
 ---
 
-# deliver-feature — orquestrador do FinAgent
+# deliver-feature — orquestrador do FinAgent (com portões de confirmação)
 
-Você (agente principal) orquestra a entrega a partir de uma spec, delegando aos
-subagentes. NÃO implemente você mesmo — delegue sempre.
+Você (agente principal) orquestra a entrega, delegando aos subagentes. NÃO implemente você
+mesmo. A marca deste fluxo: você DETECTA quais agentes a feature precisa e PEDE AUTORIZAÇÃO
+antes de chamar cada um — o usuário comanda cada passo.
 
 ## Entrada
+- Uma IDEIA ("faça o saque da carteira") → você começa criando a spec (passo 0).
+- OU o caminho de uma spec já validada (`docs/specs/<x>/spec.md`) → pule para o passo 1.
 
-Caminho de uma spec (ex.: `docs/specs/wallet/spec.md`). Se não vier, PARE e pergunte.
+## Modo de confirmação (o coração deste fluxo)
+- **Padrão — passo a passo.** Antes de CADA agente, diga em uma linha QUAL agente, POR QUÊ
+  (a detecção) e PERGUNTE "posso chamar?". Só invoque com o "sim". Se "não", pare ou ajuste.
+- **Autopilot (opt-in).** Se o usuário disser algo como "pode chamar todos sem perguntar",
+  rode sem os portões — mantendo APENAS as paradas obrigatórias (ambiguidade na spec e decisão
+  de negócio). Ele volta ao passo a passo quando quiser.
 
 ## Invariantes (NUNCA quebre)
-
 1. NUNCA implemente código você mesmo. Delegue ao subagente certo.
-2. NUNCA avance com ambiguidade. `[NEEDS CLARIFICATION]` → repasse ao usuário e PARE.
-3. UMA tarefa por vez. Nada de "big bang". Só avança quando os testes da atual passam.
-4. NUNCA invente escopo além do `tasks.md`.
-5. Item "Crítico" do review → volta ao engenheiro, corrige, revisa DE NOVO. Repita
-   até zerar os críticos.
-6. NUNCA abra o PR com review em aberto. PR só depois de zero críticos e testes verdes.
+2. NUNCA chame um subagente sem AUTORIZAÇÃO do usuário (salvo autopilot explícito).
+3. NUNCA avance com ambiguidade. `[NEEDS CLARIFICATION]` → repasse e PARE.
+4. UMA tarefa por vez; só avança quando os testes da atual passam.
+5. Item "Crítico" do review → volta ao engenheiro, corrige, revisa DE NOVO até zerar.
+6. PR só depois de zero críticos e testes verdes.
+7. Frontend sem visual definido: se há tarefa `[frontend]` e a ADR-0010 não está "Aceito"
+   (nenhuma direção escolhida), o `frontend-engineer` NÃO começa — o `designer` define a
+   direção antes (você propõe isso no roteamento).
 
-## Procedimento (ordem fixa)
+## Passo 0 — Spec (só se a entrada for uma ideia)
+Portão: "Vou chamar o `business-analyst` para escrever a spec de <ideia>. Posso?" Com o "sim",
+delegue: "Escreva a spec de <ideia> seguindo o fluxo `nova-spec`. Roteie o módulo, leia as
+regras (catálogo + módulo) e preencha as Restrições herdadas por ID."
+Mostre o resumo + as pendências `[NEEDS CLARIFICATION]`. PARE e peça o usuário validar/responder.
+Sem spec validada, não planeja. (Se a entrada for um item `chore` do backlog, NÃO há spec: pule
+direto para o passo 1.)
 
-1. PLANEJAR → delegue ao `software-engineer`:
-   "Planeje a feature em <spec>. Leia os ADRs, resolva ou liste pendências, gere
-   plan.md e tasks.md ao lado da spec."
-   - Retornou `[NEEDS CLARIFICATION]`? Repasse ao usuário e PARE. Não prossiga.
+## Passo 1 — Planejar (portão → software-engineer)
+Portão: "Vou chamar o `software-engineer` para planejar <spec>. Posso?" Com o "sim", delegue:
+"Planeje a feature em <spec>. Leia os ADRs, resolva/liste pendências, gere plan.md e tasks.md."
+- Retornou `[NEEDS CLARIFICATION]`? Repasse e PARE.
 
-2. IMPLEMENTAR → leia o `tasks.md` gerado. Para cada tarefa, EM ORDEM:
-   - `[backend]` → delegue ao `backend-engineer` (uma tarefa, com TDD).
-   - `[frontend]` → delegue ao `frontend-engineer` (uma tarefa, com testes).
-   - Só passe para a próxima quando os testes da atual passarem.
+## Passo 2 — Rotear (a detecção: quem a feature precisa)
+Leia o `tasks.md` e a spec. Monte o PLANO DE AGENTES cruzando os sinais (considere TODOS —
+não esqueça nenhum):
 
-3. REVISAR → ao fechar um conjunto coeso de tarefas, faça DUAS revisões:
-   - DOMÍNIO: delegue ao especialista do módulo (ex.: `wallet-specialist`) para validar
-     as regras de negócio (RN-x). Violação de RN é tratada como "Crítico".
-   - COMPLIANCE (se a feature toca dado pessoal): delegue ao `compliance-specialist`
-     (regras LGPD-x). Violação de LGPD é "Crítico".
-   - CÓDIGO: delegue ao `code-reviewer` (diff contra ADRs e skills).
-   - "Crítico" (de qualquer uma) → volta ao engenheiro; corrige; revisa de novo (invariante 5).
+| Sinal na spec/tasks | Agente | Por quê |
+|---------------------|--------|---------|
+| tarefa `[backend]` | `backend-engineer` | implementar (TDD) |
+| tarefa `[frontend]` **e** (ADR-0010 não "Aceito" **ou** tela/visual novo) | `designer` (ANTES do frontend) | definir/inovar a direção visual (`/definir-design`) |
+| tarefa `[frontend]` **e** ADR-0010 "Aceito" e tela padrão | `frontend-engineer` | implementar contra os tokens |
+| toca domínio wallet (saldo, saque, extrato…) | `wallet-specialist` | validar RN-x |
+| toca dado pessoal (nome, CPF, e-mail…) | `compliance-specialist` | validar LGPD-x |
+| sempre, ao fechar um conjunto de tarefas | `code-reviewer` | revisar contra ADRs/skills |
 
-4. ABRIR PR → só com zero críticos e testes verdes (invariante 6). Abra o pull request
-   no GitHub via `gh` (GitHub CLI). Siga `reference/pull-request.md` (branch, título,
-   descrição). Se o `gh` não estiver instalado/autenticado, PULE este passo e avise o usuário.
+Apresente o plano: "Detectei que esta feature precisa de: A (por X), B (por Y)… Nesta ordem,
+te pedindo autorização antes de cada um. Ok?" Diga também quando NÃO vê necessidade de um agente
+(ex.: "visual já definido na ADR-0010, não vejo necessidade do `designer`"). O usuário pode
+tirar/adicionar agente — ajuste o plano.
 
-5. REPORTAR → resuma ao usuário: o que foi entregue, tarefas concluídas x pendentes,
-   resultado de build/testes, parecer do revisor e o link do PR (se aberto).
+## Passo 3 — Executar (um portão por agente, em ordem)
+Para cada agente do plano, EM ORDEM:
+1. **Portão:** "Próximo: `<agente>` para <o quê>. Posso chamar?" Só com o "sim".
+2. Delegue UMA unidade de trabalho: uma tarefa `[backend]`/`[frontend]`; a direção visual
+   (designer); a validação de domínio/LGPD. Design vem ANTES do frontend-engineer quando o
+   plano previu o `designer`.
+3. Reporte o resultado e vá ao próximo portão. Os testes da tarefa têm que passar antes de seguir.
+
+## Passo 4 — Revisar (portões → specialists + code-reviewer)
+Ao fechar um conjunto coeso: portão antes de CADA revisor.
+- DOMÍNIO: `wallet-specialist` (RN-x) — violação = Crítico.
+- COMPLIANCE (se toca PII): `compliance-specialist` (LGPD-x) — violação = Crítico.
+- CÓDIGO: `code-reviewer` (diff contra ADRs/skills).
+- "Crítico" (de qualquer um) → volta ao engenheiro (com portão), corrige, revisa de novo.
+
+## Passo 5 — PR (portão → gh)
+Portão: "Zero críticos e testes verdes. Posso abrir o PR?" Com o "sim", siga
+`reference/pull-request.md`. Se o `gh` não estiver instalado/autenticado, pule e avise.
+
+## Passo 6 — Reportar
+Resuma: o que foi entregue, quais agentes foram chamados (e quais você pulou e por quê),
+build/testes, parecer do revisor, link do PR (se aberto).
 
 ## Economia de token (não over-orquestre)
-
-Cada subagente acionado é um CONTEXTO NOVO do zero = tokens. Dose o fan-out:
-- Feature pequena (1-2 tarefas, sem PII): UMA passada de revisão no `code-reviewer` já basta;
-  não acione os especialistas de domínio à toa.
-- Especialista de domínio (`wallet-specialist`) só quando a feature mexe naquele domínio;
-  `compliance-specialist` só quando toca dado pessoal. Reserve Opus para decisão real
-  (planejamento); o mecânico roda em modelo menor.
+Cada subagente é um contexto novo = tokens. O roteamento existe pra chamar SÓ o necessário:
+specialist de domínio só quando toca o domínio; compliance só com PII; `designer` só quando há
+visual novo/indefinido. Reserve Opus para decisão real (planejamento, design); o mecânico roda
+em modelo menor.
 
 ## Diante de decisão de negócio
-
 PARE e pergunte. ADRs vencem preferências pessoais. Nunca decida regra de negócio sozinho.

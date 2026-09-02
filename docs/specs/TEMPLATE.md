@@ -43,23 +43,34 @@ Regras que valem sempre, independentes de tela. Para o FinAgent, seja explícito
 - **Saldo:** pode ficar negativo? (não, por padrão) Qual o limite?
 - Outras invariantes específicas desta feature.
 
-## 7. Camada agêntica (linguagem natural)
+## 7. Restrições herdadas (ADR-x / RN-x)
+As decisões e regras JÁ tomadas que esta feature deve respeitar. Cite por ID — não repita o
+conteúdo; o agente navega até a fonte. Regra **✓** é lei e vira RF-x/critério de aceite;
+regra **⚠** NUNCA entra aqui como lei — vira pendência na seção 10.
+
+| ID | O que impõe A ESTA feature | Fonte |
+|----|----------------------------|-------|
+| RN-x ✓ | <a exigência concreta, em uma linha> | `docs/business-rules.md` |
+| LGPD-x ⚠ | <só se a feature tocar dado pessoal> | `docs/modules/compliance/business-rules.md` |
+| ADR-000x | <a restrição que a decisão impõe> | `docs/adr/000x-….md` |
+
+## 8. Camada agêntica (linguagem natural)
 Preencher só se a feature deve ser operável pelo agente (ADR-0006).
 - Quais operações viram **tools MCP**? (ex.: "sacar", "consultar saldo")
 - Como o usuário pediria isso em linguagem natural? (ex.: "tira 50 reais da minha carteira")
 - Restrições/autorização na borda da tool.
 - Se não se aplica: escreva "Não se aplica".
 
-## 8. Suposições e fora de escopo
+## 9. Suposições e fora de escopo
 - Suposições que você está assumindo como verdade.
 - O que explicitamente NÃO será feito agora.
 
-## 9. Pendências de decisão
+## 10. Pendências de decisão
 Liste aqui tudo que precisa da SUA decisão antes de construir. O software-engineer
 não avança enquanto houver item aberto.
 - `[NEEDS CLARIFICATION: …]`
 
-## 10. Critérios de aceite
+## 11. Critérios de aceite
 Como saber que está pronto. Devem espelhar os cenários da seção 4, verificáveis por teste.
 - [ ] <condição observável 1>
 - [ ] <condição observável 2>

@@ -30,13 +30,34 @@ Nunca escreva código para outra versão. Na dúvida, confirme no projeto antes 
 
 ## Como trabalhar aqui (o harness)
 Este projeto usa um time de subagentes + skills em `.claude/`:
-- Skills (`.claude/skills/`): padrões de backend .NET e frontend Angular. O Claude
-  carrega automaticamente conforme a tarefa.
-- Agentes (`.claude/agents/`): `software-engineer` (planeja), `backend-engineer` e
-  `frontend-engineer` (implementam consumindo as skills), `code-reviewer` (revisa).
-- Orquestrador: a skill `deliver-feature` (`/deliver-feature`) encadeia tudo.
+- Skills (`.claude/skills/`): padrões de backend .NET e frontend Angular — arquitetura,
+  convenções e **design visual** (`frontend-design`, linguagem visual sem cara de IA).
+  O Claude carrega automaticamente conforme a tarefa.
+- Agentes (`.claude/agents/`): `business-analyst` (escreve a spec), `software-engineer`
+  (planeja), `designer` (define o visual), `backend-engineer` e `frontend-engineer`
+  (implementam consumindo as skills), `code-reviewer` (revisa), e os specialists de
+  módulo (`wallet-specialist`, `compliance-specialist`) que validam por ID de regra.
+- Orquestradores: `derivar-backlog` (`/derivar-backlog`) responde "o que falta construir?" —
+  deriva `docs/backlog.md` das regras de negócio, com os ADRs como restrição;
+  `nova-spec` (`/nova-spec`) vira uma ideia em spec (executado pelo `business-analyst`);
+  `deliver-feature` (`/deliver-feature`) encadeia a entrega de uma feature (aceita uma ideia
+  ou uma spec; DETECTA os agentes necessários e pede sua autorização antes de chamar cada um);
+  `definir-design` (`/definir-design`) define a linguagem visual (ADR-0010) — 2 previews em
+  2 links, você escolhe, grava em `src/styles/tokens.css`.
+
+**ADR não vira spec.** ADR é *restrição*; a fonte de capacidade são as regras de negócio
+(`docs/business-rules.md` + `docs/modules/`). O caminho é regra → backlog → spec → entrega,
+com o ADR citado na seção 7 (Restrições herdadas) de cada spec.
 
 ### Uso típico
+- Descobrir o que construir (uma vez, ou ao abrir um módulo):
+  `/derivar-backlog`
+- Definir o visual do projeto (uma vez, antes das telas):
+  `/definir-design`
+- Gerar a spec de TODOS os itens do backlog de uma vez (modo lote):
+  "gera as specs do backlog" → o `business-analyst` escreve todas e devolve as pendências agrupadas
+- Transformar UM item do backlog em spec:
+  `/nova-spec "consultar o saldo da carteira"`
 - Planejar + implementar uma spec de uma vez:
   `/deliver-feature docs/specs/wallet/spec.md`
 - Ou passo a passo:

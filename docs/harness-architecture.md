@@ -12,7 +12,8 @@ Não é o produto — é a cozinha padronizada que produz o produto. Você entra
 descrever a ideia e validar a spec. O resto é automático:
 
 ```
-ideia → /nova-spec → você valida → /deliver-feature → planeja → implementa → revisa → build → PR
+regras → /derivar-backlog → ideia → /nova-spec → você valida → /deliver-feature → planeja →
+implementa → revisa → build → PR
 ```
 
 Ele se organiza em **dois eixos independentes** (papel e módulo) e economiza token com um
@@ -49,7 +50,7 @@ separadamente.
 
 | Eixo | O que é | Componentes |
 |------|---------|-------------|
-| **Papel** (como trabalhar) | quem planeja/implementa/revisa — vale para todo módulo | `software-engineer`, `backend-engineer`, `frontend-engineer`, `code-reviewer` + skills |
+| **Papel** (como trabalhar) | quem planeja/implementa/revisa — vale para todo módulo | `business-analyst`, `software-engineer`, `designer`, `backend-engineer`, `frontend-engineer`, `code-reviewer` + skills |
 | **Módulo** (o domínio) | as regras de negócio de cada área | `docs/modules/<mod>/business-rules.md` + agente `<mod>-specialist` |
 
 **Por que separar:** um papel novo (ex.: um `qa-engineer`) serve todos os módulos; um
@@ -82,7 +83,9 @@ flowchart TB
 
 - **Skills** = "o código está bem-feito?" (hexagonal, event sourcing/CQRS, testes, Angular).
 - **Regras de negócio** = "o dinheiro/domínio está certo?" (RN-x do wallet, LGPD-x).
-- **ADRs** = por que as decisões de arquitetura foram tomadas.
+- **ADRs** = por que as decisões de arquitetura foram tomadas. ADR é **restrição, não fonte
+  de trabalho**: nenhum item de backlog nasce de um ADR estrutural — ele entra citado na
+  seção 7 (Restrições herdadas) de cada spec. A fonte de capacidade são as regras de negócio.
 - **Enforcement** = travas determinísticas (build automático; ✓ é lei, ⚠ é sugestão).
 
 ---
@@ -91,12 +94,14 @@ flowchart TB
 
 ```mermaid
 flowchart TD
-  U([Você: descreve a ideia]) --> NS["/nova-spec<br/>rascunha a spec, marca [NEEDS CLARIFICATION]"]
+  BL["/derivar-backlog<br/>regras + ADRs → docs/backlog.md"] --> U([Você: escolhe um item])
+  U --> NS["business-analyst · /nova-spec<br/>rascunha a spec, marca [NEEDS CLARIFICATION]"]
   NS --> VAL{Você valida<br/>a spec?}
   VAL -->|pendências| U
   VAL -->|validada| DF["/deliver-feature"]
   DF --> SE["software-engineer<br/>plan.md + tasks.md + mapa de impacto"]
-  SE --> IMP["backend / frontend-engineer<br/>uma tarefa por vez, copiando templates"]
+  SE --> ROT["roteador: detecta os agentes necessários<br/>+ PORTÃO de confirmação antes de cada um"]
+  ROT --> IMP["designer (define o visual, se preciso) →<br/>backend / frontend-engineer<br/>uma tarefa por vez"]
   IMP --> REVd["wallet-specialist / compliance-specialist<br/>valida RN-x / LGPD-x"]
   REVd --> REVc["code-reviewer<br/>revisa contra skills + ADRs"]
   REVc -->|crítico| IMP
@@ -105,8 +110,10 @@ flowchart TD
   PR --> DONE([Você revisa o resultado])
 ```
 
-**Regra de ouro do fluxo:** uma tarefa por vez; nunca avança com ambiguidade; item
-"crítico" volta ao engenheiro e revisa de novo; PR só com build verde e zero críticos.
+**Regra de ouro do fluxo:** uma tarefa por vez; nunca avança com ambiguidade; você AUTORIZA
+cada chamada de agente (portão de confirmação); o `designer` vem antes do frontend quando o
+visual é novo/indefinido; item "crítico" volta ao engenheiro e revisa de novo; PR só com build
+verde e zero críticos.
 
 ---
 
@@ -211,16 +218,39 @@ O que os melhores harnesses fazem, e você tem:
   hooks/         # verify-build.ps1 (enforcement)
   settings.json  # hook de build registrado
 docs/
-  adr/                     # decisões de arquitetura (0001..0009; 0009 = stack e versões)
-  business-rules.md        # CATÁLOGO central de regras (índice do grafo)
+  adr/                     # decisões de arquitetura (0001..0010; 0009 = stack, 0010 = linguagem visual)
+  business-rules.md        # CATÁLOGO central de regras (índice do grafo — FONTE das capacidades)
+  backlog.md               # candidatos derivados das regras (gerado por /derivar-backlog)
   modules/
     README.md              # registro de módulos + como clonar
     wallet/business-rules.md      # RN-1..RN-12 (domínio)
     compliance/business-rules.md  # LGPD-1..9 (transversal)
-  specs/TEMPLATE.md        # formato de spec (entrada do fluxo)
+  specs/TEMPLATE.md        # formato de spec (seção 7 = Restrições herdadas, por ID)
   harness-architecture.md  # este documento
 ```
 
 ---
 
-*Fluxo de entrada:* `/nova-spec "<ideia>"` → valida → `/deliver-feature docs/specs/<slug>/spec.md`.
+## 10. O eixo do visual (design)
+
+Terceira perna do frontend, ao lado de arquitetura e convenções. Mesmo mecanismo do resto do
+harness (rulebook + `reference/` sob demanda, decisão gravada como lei ✓):
+
+- **Skill `frontend-design`** — a linguagem visual: invariantes anti-"cara de IA", a heurística
+  contexto→direção, e o `reference/catalog.md` (índice de direções — HOJE VAZIO, a popular com
+  fontes SEM copyright). Consumida pelo `designer` e pelo `frontend-engineer`.
+- **Comando `/definir-design`** (skill `definir-design`) — explora o catálogo, gera **2 direções
+  em 2 links** para o usuário ver, e ao escolher **grava** em `docs/adr/0010-linguagem-visual.md`
+  + `src/styles/tokens.css` (fonte única de tokens).
+- **Regra ✓/⚠:** enquanto a ADR-0010 é "Proposto", o `frontend-engineer` PARA antes de inventar
+  visual — a direção precisa ser escolhida primeiro. Escolhida, vira lei ✓ e toda tela lê os tokens.
+
+O "grava a escolha" é o ADR + tokens; os "2 links pra olhar" são os previews. Curadoria do
+catálogo (fontes sem copyright → destilar princípios/tokens, nunca clonar markup) é o passo
+pendente antes do primeiro `/definir-design`.
+
+---
+
+*Fluxo de entrada:* `/derivar-backlog` → escolhe o item → `/nova-spec "<ideia>"` → valida →
+`/deliver-feature docs/specs/<slug>/spec.md`.
+*Fluxo do visual:* `/definir-design` → 2 previews em 2 links → você escolhe → grava ADR-0010 + `src/styles/tokens.css`.
