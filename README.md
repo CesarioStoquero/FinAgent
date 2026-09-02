@@ -34,14 +34,16 @@ flowchart LR
 
 | Camada | Tecnologia |
 |---|---|
-| Linguagem / runtime | C# / .NET 8 |
+| Linguagem / runtime | C# 14 / .NET 10 (LTS, `net10.0`) |
 | Event Store (escrita) | PostgreSQL (append-only, concorrência otimista) |
 | Read Model (leitura) | MongoDB |
 | Mensageria | Apache Kafka |
 | Camada agêntica | MCP C# SDK + Microsoft.Extensions.AI |
-| Testes | xUnit + Testcontainers |
+| Testes | xUnit v3 + AwesomeAssertions + Testcontainers |
 | Infra local | Docker Compose |
 | CI/CD | GitHub Actions (+ Azure DevOps na v3) |
+
+> Versões **fixadas** pela [ADR-0009](docs/adr/0009-stack-e-versoes.md) — não altere aqui sem alterar o ADR.
 
 ## Estrutura
 
@@ -70,6 +72,9 @@ Todas registradas em [`docs/adr/`](docs/adr/):
 - [ADR-0005](docs/adr/0005-mongodb-read-model.md) — MongoDB no read model
 - [ADR-0006](docs/adr/0006-camada-agentica-mcp.md) — Camada agêntica via MCP
 - [ADR-0007](docs/adr/0007-postgres-event-store.md) — PostgreSQL como Event Store
+- [ADR-0008](docs/adr/0008-partida-dobrada-no-ledger.md) — Partida dobrada no ledger
+- [ADR-0009](docs/adr/0009-stack-e-versoes.md) — Stack e versões de plataforma
+- [ADR-0010](docs/adr/0010-linguagem-visual.md) — Linguagem visual do frontend
 
 ## Rodando a infra local
 
