@@ -25,11 +25,26 @@ módulo. Specs, testes, código e agentes referenciam pelo ID.
 | RN-4 | Correção só por estorno (evento oposto), nunca "editando" o passado. | ✓ Confirmada | ADR-0008 |
 | RN-12 | Só se opera conta já aberta. | ✓ Confirmada | skill CQRS |
 | RN-7 | Transação tem estado pendente (mutável) → postada (imutável). | ⚠ Confirmar | Modern Treasury |
+| RN-13 | **Camada agêntica:** o agente consulta livremente (saldo, extrato); toda operação que move dinheiro exige confirmação explícita do titular na conversa; estorno NÃO é operável pelo agente. | ✓ Confirmada | Decisão 2026-09-02 |
+| RN-14 | **Atores:** o único ator da v1 é o titular, na própria carteira. Estorno é operação interna — não exposta ao titular nem ao agente. | ✓ Confirmada | Decisão 2026-09-02 |
+| RN-15 | **Idempotência:** toda operação que move dinheiro carrega chave de idempotência; pedido repetido com a mesma chave devolve o resultado original, sem criar lançamento novo. | ✓ Confirmada | Decisão 2026-09-02 |
+| RN-16 | **Estorno vence o saldo:** o estorno é sempre aceito, mesmo que deixe a conta negativa. RN-10 restringe o SAQUE (ato voluntário), não a correção contábil. | ✓ Confirmada | Decisão 2026-09-02 |
 
 > **Decidido (ADR-0008):** o FinAgent adota **partida dobrada** — agregado `Account`, evento
 > `TransactionPosted` com lançamentos que somam zero, e uma conta de contrapartida do sistema
 > (`ExternalFunding`). RN-1 e RN-4 viraram ✓. RN-7 (estados pendente/postado) segue ⚠: só
 > vira lei se o FinAgent precisar de liquidação em duas fases — hoje a transação já nasce postada.
+
+> **Decidido (2026-09-02, ao validar as specs BL-1..BL-7):** entram RN-13..RN-16.
+> **RN-7 segue ⚠ e NÃO é adotada na v1** — sem integração bancária real, "pendente" não tem
+> significado de negócio; a transação nasce postada. **Atenção à tensão RN-10 × RN-16:** saque
+> nunca deixa o saldo negativo, estorno pode — a diferença é que saque é ato voluntário do
+> titular e estorno é correção contábil, e recusá-lo deixaria os livros errados para sempre
+> (violando RN-1 e RN-5). É exatamente o caso de "regra NOVA e explícita" que RN-10 exige.
+> Fora do catálogo de propósito (ficam nas specs, por serem locais à feature): moeda BRL fixa,
+> uma carteira por titular, estorno integral/com motivo/não re-estornável, paginação do extrato.
+> A v1 **não coleta PII** (titular é identificador opaco) — se isso mudar, as LGPD-x ⚠ precisam
+> ser confirmadas antes.
 
 ## Compliance / LGPD (transversal — qualquer feature com dado pessoal)
 

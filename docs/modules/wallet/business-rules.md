@@ -53,10 +53,33 @@ verdade no mundo real), não implementação. Specs, testes e código referencia
   conversão, se existir, é uma transação explícita com taxa, não uma soma direta.
 - **RN-10 (Saldo não-negativo por padrão):** um saque não pode deixar a carteira
   negativa. Saque > saldo é recusado. (Se algum produto permitir cheque especial, isso
-  é uma regra NOVA e explícita, nunca o default.)
+  é uma regra NOVA e explícita, nunca o default.) **Ver RN-16:** o estorno é a exceção já
+  decidida — ele pode deixar a conta negativa; o saque, nunca.
 - **RN-11 (Valores positivos):** depósito e saque exigem valor > 0.
 - **RN-12 (Carteira existe antes de operar):** só se deposita/saca de uma carteira já
   aberta.
+
+## Regras da operação (decididas em 2026-09-02)
+
+- **RN-13 (Camada agêntica):** o agente de linguagem natural **consulta livremente** (saldo,
+  extrato). Toda operação que **move dinheiro** (depósito, saque) exige **confirmação explícita
+  do titular** na conversa antes de ser efetivada. **Estorno não é operável pelo agente.**
+  Motivo: leitura é reversível, escrita num ledger imutável não é.
+- **RN-14 (Ator único na v1):** o único ator é o **titular**, operando a **própria** carteira.
+  O **estorno é operação interna** — não exposto ao titular nem ao agente, porque estorno na
+  mão de quem se beneficia dele é canal de fraude.
+- **RN-15 (Idempotência):** toda operação que move dinheiro carrega uma **chave de
+  idempotência**. Pedido repetido com a mesma chave **devolve o resultado original** e NÃO cria
+  lançamento novo. Motivo: num ledger append-only, uma duplicata por retry de rede é
+  permanente — só corrigível por estorno.
+- **RN-16 (Estorno vence o saldo):** o estorno é **sempre aceito**, ainda que deixe a conta
+  **negativa** (ex.: estornar um depósito cujo valor já foi sacado). Motivo: **RN-10 protege o
+  saque**, que é ato voluntário do titular; o estorno é **correção contábil**, e recusá-lo
+  deixaria os livros errados para sempre, violando RN-1 (soma zero) e RN-5 (completude).
+  Esta é a "regra NOVA e explícita" que a própria RN-10 exige para admitir saldo negativo.
+
+> **RN-7 não foi adotada na v1.** A transação nasce **postada**; não há estado pendente.
+> A regra segue ⚠ no catálogo — só vira lei se o FinAgent ganhar liquidação em duas fases.
 
 ## Como usar estas regras
 

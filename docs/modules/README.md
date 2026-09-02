@@ -24,7 +24,9 @@ regras (LGPD) que se aplica a QUALQUER feature que toque dado pessoal. Rode o
    nome, a descrição e o caminho do business-rules que ele lê. Ele continua somente-leitura
    e responde/valida por ID de regra.
 3. Adicione a linha do módulo na tabela acima.
-4. Pronto: o `software-engineer` passa a consultar as regras do módulo no planejamento e o
+4. Rode `/derivar-backlog` — as regras do módulo novo viram itens candidatos em `docs/backlog.md`.
+5. Pronto: o `business-analyst` passa a citar as regras do módulo na spec (seção 7), o
+   `software-engineer` as consulta no planejamento e o
    `deliver-feature` usa o especialista como porta de validação de domínio.
 
 ## Princípio
