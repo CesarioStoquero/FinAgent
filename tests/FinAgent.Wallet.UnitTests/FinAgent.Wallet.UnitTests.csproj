@@ -1,0 +1,17 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!-- TargetFramework, Nullable, LangVersion, ImplicitUsings e TreatWarningsAsErrors
+       vêm do Directory.Build.props da raiz (ADR-0009). -->
+
+  <ItemGroup>
+    <PackageReference Include="AwesomeAssertions" Version="9.6.0" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="18.9.0" />
+    <PackageReference Include="xunit.v3" Version="4.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\FinAgent.Wallet.Domain\FinAgent.Wallet.Domain.csproj" />
+    <ProjectReference Include="..\..\src\FinAgent.Wallet.Application\FinAgent.Wallet.Application.csproj" />
+  </ItemGroup>
+
+</Project>

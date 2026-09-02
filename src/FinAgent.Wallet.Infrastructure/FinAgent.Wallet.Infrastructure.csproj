@@ -1,0 +1,11 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!-- TargetFramework, Nullable, LangVersion, ImplicitUsings e TreatWarningsAsErrors
+       vêm do Directory.Build.props da raiz (ADR-0009). -->
+
+  <ItemGroup>
+    <ProjectReference Include="..\FinAgent.Wallet.Application\FinAgent.Wallet.Application.csproj" />
+    <ProjectReference Include="..\FinAgent.Wallet.Domain\FinAgent.Wallet.Domain.csproj" />
+  </ItemGroup>
+
+</Project>

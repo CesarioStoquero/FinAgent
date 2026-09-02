@@ -12,6 +12,8 @@ Referência: ADR-0003. Regra inegociável: **dependências apontam para dentro**
 
 Antes de criar uma classe, decida em QUAL camada ela mora (tabela abaixo). Se for um
 projeto novo ou wiring de DI, ABRA `reference/project-layout.md` e copie a estrutura.
+Não existe `.sln`/`.slnx` ainda? a seção **"Bootstrap da solution"** desse mesmo arquivo tem a
+sequência exata de `dotnet new` — NUNCA improvise a criação dos projetos.
 
 ## Invariantes (NUNCA quebre)
 

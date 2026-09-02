@@ -1,0 +1,10 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+  </PropertyGroup>
+
+  <!-- TargetFramework, Nullable, LangVersion, ImplicitUsings e TreatWarningsAsErrors
+       vêm do Directory.Build.props da raiz (ADR-0009). -->
+
+</Project>

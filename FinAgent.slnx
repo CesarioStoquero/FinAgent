@@ -1,0 +1,14 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/FinAgent.Ai.Agent/FinAgent.Ai.Agent.csproj" />
+    <Project Path="src/FinAgent.Ai.McpServer/FinAgent.Ai.McpServer.csproj" />
+    <Project Path="src/FinAgent.Wallet.Api/FinAgent.Wallet.Api.csproj" />
+    <Project Path="src/FinAgent.Wallet.Application/FinAgent.Wallet.Application.csproj" />
+    <Project Path="src/FinAgent.Wallet.Domain/FinAgent.Wallet.Domain.csproj" />
+    <Project Path="src/FinAgent.Wallet.Infrastructure/FinAgent.Wallet.Infrastructure.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/FinAgent.Wallet.IntegrationTests/FinAgent.Wallet.IntegrationTests.csproj" />
+    <Project Path="tests/FinAgent.Wallet.UnitTests/FinAgent.Wallet.UnitTests.csproj" />
+  </Folder>
+</Solution>
