@@ -68,11 +68,19 @@ dotnet add tests/FinAgent.Wallet.IntegrationTests reference src/FinAgent.Wallet.
 FinAgent.Wallet.Domain/           # 0 referências. Agregados, eventos, VOs, PORTAS.
 FinAgent.Wallet.Application/       # ref: Domain. Commands/queries + handlers.
 FinAgent.Wallet.Infrastructure/    # ref: Application, Domain. Adapters (PG/Mongo/Kafka).
-FinAgent.Wallet.Api/               # ref: Application, Domain. Minimal API (entrada).
+FinAgent.Wallet.Api/               # ref: Application, Domain, Infrastructure (composition
+                                   # root). Minimal API (entrada).
 ```
 
 Regra visual: a seta de `<ProjectReference>` só pode apontar para a esquerda (para dentro).
 `Domain` não tem nenhuma. `Infrastructure` NUNCA é referenciado por `Application`.
+
+**Por que a Api referencia Infrastructure.** A Api é o *composition root*: é ela que chama
+`AddWalletInfrastructure(...)` para escolher qual adapter satisfaz cada porta (ver a seção de
+composição mais abaixo). Isso não fura o ADR-0003 — a regra que importa é que `Domain` e
+`Application` nunca conheçam infraestrutura, e é ISSO que o teste de arquitetura trava.
+Mantenha os adapters `internal`, expostos só pelo método de extensão de DI, para que a Api
+componha sem poder tocar nas classes concretas.
 
 ## Domain.csproj — provando o isolamento
 

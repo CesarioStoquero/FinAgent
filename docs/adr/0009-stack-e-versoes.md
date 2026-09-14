@@ -22,6 +22,9 @@ esqueleto de código.
 - O .NET 11 (nov/2026) é **STS** (18 meses) — descartado: backend financeiro fica em LTS.
 - OpenAPI pelo **`AddOpenApi()`/`MapOpenApi()` nativos**. **Proibido Swashbuckle** em
   projeto novo (é a orientação oficial a partir do .NET 9).
+- Migração de schema: **EF Core 10.0.11** + **`Npgsql.EntityFrameworkCore.PostgreSQL` 10.0.3**,
+  modelo por **Fluent API** (nunca Data Annotations). O EF é o mecanismo de SCHEMA; o event
+  store continua sendo lido e escrito com **Npgsql cru**. Ver **ADR-0011**.
 - Testes: **xUnit v3** + **AwesomeAssertions** + **Testcontainers**.
   - AwesomeAssertions é fork open-source do FluentAssertions v7 com **API idêntica**
     (`.Should().Be()`), adotado porque o FluentAssertions v8 mudou para licença comercial.

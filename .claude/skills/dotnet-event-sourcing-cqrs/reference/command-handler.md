@@ -22,16 +22,24 @@ public interface ICommandHandler<TCommand, TResult> where TCommand : ICommand<TR
 ```csharp
 namespace FinAgent.Wallet.Domain.Ports;
 
+// O envelope carrega o que só o event store sabe depois de gravar: a versão atribuída
+// e o instante. A projeção (ver projection.md) DEPENDE de `Version` para o upsert
+// idempotente — por isso o publisher recebe envelopes, não `IDomainEvent` cru.
+public sealed record EventEnvelope(
+    Guid AggregateId, int Version, DateTimeOffset OccurredAt, IDomainEvent Event);
+
 public interface IEventStore
 {
     Task<IReadOnlyList<IDomainEvent>> LoadAsync(Guid aggregateId, CancellationToken ct);
     // Lança ConcurrencyException se a versão no banco != expectedVersion.
-    Task AppendAsync(Guid aggregateId, IReadOnlyList<IDomainEvent> events, int expectedVersion, CancellationToken ct);
+    // Devolve os envelopes gravados, com as versões que o store atribuiu.
+    Task<IReadOnlyList<EventEnvelope>> AppendAsync(
+        Guid aggregateId, IReadOnlyList<IDomainEvent> events, int expectedVersion, CancellationToken ct);
 }
 
 public interface IEventPublisher
 {
-    Task PublishAsync(IReadOnlyList<IDomainEvent> events, CancellationToken ct);
+    Task PublishAsync(IReadOnlyList<EventEnvelope> events, CancellationToken ct);
 }
 ```
 
@@ -54,8 +62,9 @@ public sealed class WithdrawHandler(IEventStore store, IEventPublisher publisher
         account.Withdraw(new Money(cmd.AmountCents, account.Balance.Currency)); // 3 (regra + soma-zero no agg)
 
         // 4 — um único append; TransactionPosted já carrega os dois lados balanceados.
-        await store.AppendAsync(cmd.AccountId, account.UncommittedEvents, account.Version, ct);
-        await publisher.PublishAsync(account.UncommittedEvents, ct);      // 5
+        var envelopes = await store.AppendAsync(
+            cmd.AccountId, account.UncommittedEvents, account.Version, ct);
+        await publisher.PublishAsync(envelopes, ct);                     // 5
         account.ClearUncommittedEvents();                                // 6
         return Unit.Value;
     }
@@ -69,4 +78,9 @@ public sealed class WithdrawHandler(IEventStore store, IEventPublisher publisher
 - Tentar dar `AppendAsync` em duas contas separadas para "debitar uma e creditar outra" —
   no modelo do ADR-0008 os dois lados vêm num só evento, um só append. Nada de dois appends.
 - Pular `expectedVersion`, publicar antes do append, ou esquecer o `ClearUncommittedEvents`.
+- Passar um literal em `expectedVersion` (`-1` para "stream novo") em vez de `account.Version`.
+  Funciona por acidente enquanto `Raise` não incrementa a versão, e passa a mentir em silêncio
+  no dia em que incrementar.
+- Publicar `IDomainEvent` cru: sem a `Version` do envelope a projeção não consegue ser
+  idempotente e reprocessar mensagem (Kafka é at-least-once) corrompe o read model.
 - Retornar o saldo direto da escrita — quem lê saldo é a query (read model).

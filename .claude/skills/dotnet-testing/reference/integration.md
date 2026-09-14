@@ -15,7 +15,11 @@ public sealed class PostgresFixture : IAsyncLifetime
     public async Task InitializeAsync()
     {
         await _pg.StartAsync();
-        // aplicar migração/DDL do event store aqui
+        // ADR-0011: schema nasce por MIGRAÇÃO EF Core, nunca por DDL solta. Aplique
+        // as migrações aqui (context.Database.MigrateAsync()) — jamais um CREATE TABLE
+        // ad hoc no teste, nem um .sql aplicado fora do mecanismo de migração.
+        await using var dbContext = CreateDbContext();
+        await dbContext.Database.MigrateAsync();
     }
 
     public Task DisposeAsync() => _pg.DisposeAsync().AsTask();

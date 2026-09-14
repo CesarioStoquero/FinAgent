@@ -21,7 +21,7 @@
 
 ### BL-4 — Solution .NET e projetos das camadas
 
-- **Tipo:** chore · **Módulo:** — · **Estado:** pendente
+- **Tipo:** chore · **Módulo:** — · **Estado:** entregue (commit `046edbf`)
 - **O quê:** criar o `.sln` e os `.csproj` de `Wallet.Domain`, `Wallet.Application`,
   `Wallet.Infrastructure`, `Wallet.Api`, `Ai.McpServer`, `Ai.Agent` + os dois projetos de
   teste, com as referências apontando pra dentro e o `Directory.Build.props` já existente.
@@ -36,7 +36,7 @@
 
 ### BL-5 — Abrir uma carteira
 
-- **Tipo:** capacidade · **Módulo:** wallet · **Estado:** spec escrita
+- **Tipo:** capacidade · **Módulo:** wallet · **Estado:** entregue (2026-09-02)
 - **O quê:** o titular passa a ter uma carteira própria, identificada, apta a receber e
   movimentar valor. Antes disso nenhuma operação é possível.
 - **Por quê:** RN-12 torna toda operação dependente de uma carteira existente. É a raiz de
@@ -47,6 +47,14 @@
 - **Depende de:** BL-4
 - **Decisões abertas:** nenhuma — as 26 pendências foram decididas em 2026-09-02
 - **Spec:** `docs/specs/abrir-carteira/spec.md` — **Validada** em 2026-09-02
+- **Plano/tarefas:** `docs/specs/abrir-carteira/plan.md` · `tasks.md` — T1–T23 entregues
+- **Entregue em 2026-09-02:** `POST /wallets` gravando `AccountOpened` no event store,
+  publicando no Kafka e projetando no read model. Revisão sem críticos (`code-reviewer` +
+  `wallet-specialist`). 64 testes: 48 verdes, 16 pulados porque a máquina não tem Docker
+  (os adapters Postgres/Kafka/Mongo estão escritos e com teste, mas não foram executados).
+- **Fica pendente:** T24 (tool MCP `abrir_carteira`), bloqueada pela pendência P2 do plano —
+  nenhum ADR fixa a versão do SDK MCP. Ver também P1 (autenticação real do titular: hoje o
+  `OwnerContext` lê o header `X-Owner-Id`, que é solução de v1/dev).
 - **Entrada:** `/deliver-feature docs/specs/abrir-carteira/spec.md`
 
 ### BL-1 — Depositar dinheiro na carteira
@@ -166,9 +174,9 @@
 
 ## Ordem sugerida
 
-1. **BL-4** (chore) — sem solution, nada roda.
-2. **BL-5** — RN-12 faz todo o resto depender da carteira aberta.
-3. **BL-1** — primeira entrada de dinheiro; destrava BL-2, BL-3, BL-6, BL-7.
+1. ~~**BL-4**~~ (chore) — **entregue** (commit `046edbf`).
+2. ~~**BL-5**~~ — **entregue** em 2026-09-02 (menos a tool MCP, T24).
+3. **BL-1** — primeira entrada de dinheiro; destrava BL-2, BL-3, BL-6, BL-7. **← próximo**
 4. **BL-2** — menor esforço sobre BL-1, entrega o valor mais pedido.
 5. **BL-10** (chore) — agora existe código e teste para a CI proteger.
 6. **BL-6** — fecha o par depósito/saque e exercita a recusa (RN-10).
