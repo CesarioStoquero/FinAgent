@@ -4,6 +4,10 @@
        vêm do Directory.Build.props da raiz (ADR-0009). -->
 
   <ItemGroup>
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="10.0.11" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\FinAgent.Wallet.Domain\FinAgent.Wallet.Domain.csproj" />
   </ItemGroup>
 

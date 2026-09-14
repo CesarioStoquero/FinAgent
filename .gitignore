@@ -4,6 +4,7 @@ obj/
 *.user
 [Bb]in/
 [Oo]bj/
+TestResults/
 
 # Visual Studio
 .vs/

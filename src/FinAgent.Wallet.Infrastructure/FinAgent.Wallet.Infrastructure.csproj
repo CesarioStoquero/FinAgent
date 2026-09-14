@@ -3,9 +3,38 @@
   <!-- TargetFramework, Nullable, LangVersion, ImplicitUsings e TreatWarningsAsErrors
        vêm do Directory.Build.props da raiz (ADR-0009). -->
 
+  <!-- Único projeto que enxerga Npgsql/MongoDB.Driver/Confluent.Kafka (ADR-0003). -->
+  <ItemGroup>
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="10.0.11" />
+    <!-- Pino explícito: Npgsql.EntityFrameworkCore.PostgreSQL 10.0.3 (ADR-0009) declara
+         dependência de Microsoft.EntityFrameworkCore.Relational 10.0.4, mais velho que
+         o 10.0.11 fixado acima — sem isto, o NuGet emite aviso de downgrade (MSB3277). -->
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="10.0.11" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="10.0.11">
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
+    <PackageReference Include="Npgsql" Version="10.0.3" />
+    <PackageReference Include="Confluent.Kafka" Version="2.15.0" />
+    <PackageReference Include="MongoDB.Driver" Version="3.11.1" />
+    <PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" Version="10.0.11" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="10.0.11" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="10.0.11" />
+    <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="10.0.3" />
+  </ItemGroup>
+
   <ItemGroup>
     <ProjectReference Include="..\FinAgent.Wallet.Application\FinAgent.Wallet.Application.csproj" />
     <ProjectReference Include="..\FinAgent.Wallet.Domain\FinAgent.Wallet.Domain.csproj" />
+  </ItemGroup>
+
+  <!-- Adapters são internal, expostos só via DI (ADR-0003). O projeto de integração
+       precisa enxergá-los para testar cada adapter diretamente (reference/integration.md).
+       A Api precisa enxergar MigrationRunner (ADR-0011) para aplicar migração no startup
+       quando Wallet:Postgres:ApplyMigrationsOnStartup estiver ligado. -->
+  <ItemGroup>
+    <InternalsVisibleTo Include="FinAgent.Wallet.IntegrationTests" />
+    <InternalsVisibleTo Include="FinAgent.Wallet.Api" />
   </ItemGroup>
 
 </Project>

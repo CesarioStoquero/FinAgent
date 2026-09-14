@@ -6,6 +6,22 @@
   <ItemGroup>
     <ProjectReference Include="..\FinAgent.Wallet.Application\FinAgent.Wallet.Application.csproj" />
     <ProjectReference Include="..\FinAgent.Wallet.Domain\FinAgent.Wallet.Domain.csproj" />
+    <!-- A Api é o composition root: compõe AddWalletInfrastructure() e, quando ligado
+         por config, aplica a migração EF Core do event store no startup (ADR-0011).
+         Referenciar Infrastructure aqui não viola a regra de dependência (ADR-0003) —
+         é o Domain/Application que nunca podem referenciar Infrastructure; a borda de
+         composição pode. -->
+    <ProjectReference Include="..\FinAgent.Wallet.Infrastructure\FinAgent.Wallet.Infrastructure.csproj" />
+  </ItemGroup>
+
+  <!-- O projeto de integração precisa enxergar OwnerContext/DomainExceptionHandler
+       (internal) para testar a resolução de titular e o mapeamento de erro (T22/T23),
+       e Program (WebApplicationFactory<Program>). -->
+  <ItemGroup>
+    <InternalsVisibleTo Include="FinAgent.Wallet.IntegrationTests" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="10.0.11" />
   </ItemGroup>
 
 </Project>
